@@ -1,0 +1,12 @@
+{
+  "name": "Make RSS Great Again",
+  "version": "0.0.1",
+  "description": "Adds RSS buttons to websites",
+  "content_scripts": [
+    {
+      "matches": ["https://twitter.com/*"],
+      "js": ["twitter_content_script.js"],
+      "run_at": "document_end"
+  ],
+  "manifest_version": 2
+}
