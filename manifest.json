@@ -2,11 +2,28 @@
   "name": "Make RSS Great Again",
   "version": "0.0.1",
   "description": "Adds RSS buttons to websites",
+  "manifest_version": 2,
+  "web_accessible_resources": [
+    "img/*.*"
+  ],
+  "default_icon": "img/rss_icon.png",
+  "background": {
+    "scripts": [
+      "twitter_background_script.js"
+    ]
+  },
   "content_scripts": [
     {
-      "matches": ["https://twitter.com/*"],
-      "js": ["twitter_content_script.js"],
-      "run_at": "document_end"
+      "matches": [
+        "https://twitter.com/*"
+      ],
+      "js": [
+        "twitter_content_script.js"
+      ],
+      "run_at": "document_idle"
+    }
   ],
-  "manifest_version": 2
+  "permissions": [
+    "tabs"
+  ]
 }
