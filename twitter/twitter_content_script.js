@@ -6,25 +6,23 @@
 // Function should reload when URL changes
 // https://medium.com/heptagon/replace-images-in-a-website-using-your-own-with-chrome-extension-9b157bbd1687
 
+console.log("twitter content script loaded")
 
-const TWITTER_RSS_BUTTON_ID = "make-twitter-great-again"
-
-const delay = (delayInms) => {
+const delay = async (ms) => {
   return new Promise(resolve => {
-    setTimeout(() => {
-      resolve(2);
-    }, delayInms);
+    setTimeout(() => resolve(2), ms)
   })
 }
 
-const getMoreElement = (document) => {
-  return document.querySelector("div[aria-label=\"More\"]")
+const TWITTER_RSS_BUTTON_ID = "data-make-rss-great-again"
+
+Element.prototype.remove = function () {
+  this.parentElement.removeChild(this)
 }
 
 const getButtonsDiv = (document) => {
   return document.querySelector("div[class=\"css-1dbjc4n r-obd0qt r-18u37iz r-1w6e6rj r-1h0z5md r-dnmrzs\"")
 }
-
 
 const createTwitterRssImage = (document, imageURL) => {
   const rssImage = document.createElement("img")
@@ -37,28 +35,22 @@ const createTwitterRssImage = (document, imageURL) => {
 
 const createRssElement = (url, image) => {
   const rssElement = document.createElement("a")
-  rssElement.id = TWITTER_RSS_BUTTON_ID
+  rssElement.setAttribute(TWITTER_RSS_BUTTON_ID, null)
   rssElement.href = url
   rssElement.appendChild(image)
   return rssElement
 }
 
-Element.prototype.remove = function () {
-  this.parentElement.removeChild(this);
-}
-
 const main = async () => {
-  const userName = document.location.pathname.split("/")?.[1]
+  const pagePath = document.location.pathname.split("/")?.[1]
 
   const pagesThatAreNotUserNames = ["home", "explore", "notifications", "messages", "i", "compose"]
 
-  if (pagesThatAreNotUserNames.includes(userName)) {
+  if (pagesThatAreNotUserNames.includes(pagePath)) {
     return console.log("Page is not a twitter user page")
   }
 
-  // Remove any previously added button
-  document.getElementById(TWITTER_RSS_BUTTON_ID)?.remove()
-
+  // Twitter is a SPA, so wait until the element loads
   let buttonsDiv = getButtonsDiv(document)
 
   while (!buttonsDiv) {
@@ -66,19 +58,27 @@ const main = async () => {
     buttonsDiv = getButtonsDiv(document)
   }
 
+  // Remove prior buttons
+  const previousButtons = [...document.querySelectorAll("[" + TWITTER_RSS_BUTTON_ID + "]")]
+  previousButtons.forEach(item => {
+    item?.remove()
+  })
+
+  // Add new button
   const imageURL = chrome.runtime.getURL("img/rss_icon.svg")
-  const rssElement = createRssElement("https://nitter.net/" + userName + "/rss", createTwitterRssImage(document, imageURL))
+  const rssElement = createRssElement("https://nitter.net/" + pagePath + "/rss", createTwitterRssImage(document, imageURL))
   buttonsDiv.appendChild(rssElement)
 }
 
-chrome.runtime.onMessage.addListener(
-  function (request, sender, sendResponse) {
-    // listen for messages sent from background.js
-    if (request.message !== 'twitter') {
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    console.log("get message")
+    if (request.message !== "make-twitter-great-again") {
       return
     }
-    main()
+
+    main().then()
   }
 )
 
-main()
+console.log("twitter content script loaded end")
+main().then()
