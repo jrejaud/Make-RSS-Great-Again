@@ -6,6 +6,11 @@
   "web_accessible_resources": [
     "img/*.*"
   ],
+  "icons": {
+    "16": "img/icon-16.png",
+    "48": "img/icon-48.png",
+    "128": "img/icon-128.png"
+  },
   "background": {
     "scripts": [
       "background_script.js"
