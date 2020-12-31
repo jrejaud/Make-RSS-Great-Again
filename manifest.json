@@ -13,10 +13,6 @@
   },
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
-      "js": ["utils/Utils.js"]
-    },
-    {
       "matches": [
         "https://twitter.com/*"
       ],
@@ -26,12 +22,16 @@
       "run_at": "document_end"
     },
     {
-      "matches": ["https://www.youtube.com/*"],
-      "js": ["youtube/youtube_content_script.js"],
-      "run_at": "document_end"
+      "matches": [
+        "https://www.youtube.com/*"
+      ],
+      "js": [
+        "youtube/youtube_content_script.js"
+      ]
     }
   ],
   "permissions": [
-    "tabs"
+    "tabs",
+    "https://www.youtube.com/*"
   ]
 }

@@ -6,8 +6,6 @@
 // Function should reload when URL changes
 // https://medium.com/heptagon/replace-images-in-a-website-using-your-own-with-chrome-extension-9b157bbd1687
 
-console.log("twitter content script loaded")
-
 const delay = async (ms) => {
   return new Promise(resolve => {
     setTimeout(() => resolve(2), ms)
@@ -71,7 +69,6 @@ const main = async () => {
 }
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    console.log("get message")
     if (request.message !== "make-twitter-great-again") {
       return
     }
@@ -80,5 +77,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
 )
 
-console.log("twitter content script loaded end")
+// This page is loaded at document_end
+// (so that is will be ready to receive the message from the background script)
 main().then()
