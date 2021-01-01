@@ -33,10 +33,17 @@
       "js": [
         "youtube/youtube_content_script.js"
       ]
+    },
+    {
+      "matches": [
+        "https://www.reddit.com/*"
+      ],
+      "js": [
+        "reddit/reddit_content_script.js"
+      ]
     }
   ],
   "permissions": [
-    "tabs",
-    "https://www.youtube.com/*"
+    "tabs"
   ]
 }

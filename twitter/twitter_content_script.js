@@ -69,12 +69,12 @@ const main = async () => {
 }
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.message !== "make-twitter-great-again") {
-      return
-    }
-
-    main().then()
+  if (request.message !== "make-twitter-great-again") {
+    return
   }
+
+  main().then()
+}
 )
 
 // This page is loaded at document_end

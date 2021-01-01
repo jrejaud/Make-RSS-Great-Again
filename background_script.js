@@ -12,9 +12,16 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 
     // If you are on youtube
     else if (changeInfo.url.indexOf("https://www.youtube.com/") === 0) {
-      console.log("On youtube")
       chrome.tabs.sendMessage(tabId, {
         message: "make-youtube-great-again",
+      })
+    }
+
+    // If you are on reddit
+    else if (changeInfo.url.indexOf("https://www.reddit.com/") === 0) {
+      console.log("On Reddit")
+      chrome.tabs.sendMessage(tabId, {
+        message: "make-reddit-great-again",
       })
     }
   }
