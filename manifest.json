@@ -40,7 +40,8 @@
       ],
       "js": [
         "reddit/reddit_content_script.js"
-      ]
+      ],
+      "run_at": "document_end"
     }
   ],
   "permissions": [
