@@ -26,49 +26,87 @@ Element.prototype.remove = function () {
   this.parentElement.removeChild(this)
 }
 
-const getChannelID = async (pageType, document) => {
+const getRSSURL = async (pageType, document) => {
 
-  const getChannelIDWatchPage = (document) => {
-    return document.querySelector("#top-row > ytd-video-owner-renderer > a")?.href.replace("https://www.youtube.com/channel/", "")
+  const getRSSUrlFromWatchPage = (document) => {
+    // Get the URL to 
+    const channelPageURL = document.querySelector("#top-row > ytd-video-owner-renderer > a")?.href
+
+    // Channel and user pages are the same thing, except their URLs are structured 
+    // differently
+
+    // If this is a channel page
+    if (channelPageURL.includes("https://www.youtube.com/channel/")) {
+      const channelID = channelPageURL.replace("https://www.youtube.com/channel/", "")
+      return "https://www.youtube.com/feeds/videos.xml?channel_id=" + channelID
+    }
+
+    // If this is a user page
+    else if (channelPageURL.includes("https://www.youtube.com/user/")) {
+      const channelUsername = channelPageURL.replace("https://www.youtube.com/user/", "")
+      return "https://www.youtube.com/feeds/videos.xml?user=" + channelUsername
+    }
+
+    // If it is neither
+    return null
   }
 
-  const getChannelIDUserPage = (document) => {
+  const getRSSURLFromUserPage = (document) => {
     // This is weird, but it works
-    return document.querySelector("[name=\"twitter:url\"]")?.content
+    const pageURL = document.querySelector("[name=\"twitter:url\"]")?.content
+    if (!pageURL) {
+      return null
+    }
+    const channelUsername = pageURL.replace("https://www.youtube.com/user/", "")
+    return "https://www.youtube.com/feeds/videos.xml?user=" + channelUsername
   }
 
-  let channelID = null
+  const getRSSURLFromChannelPage = (document) => {
+    const pageURL = document.querySelector("[name=\"twitter:url\"]")?.content
+    if (!pageURL) {
+      return null
+    }
+    const channelID = pageURL.replace("https://www.youtube.com/channel/", "")
+    return "https://www.youtube.com/feeds/videos.xml?channel_id=" + channelID
+  }
+
+  let rssURL = null
 
   switch (pageType) {
     case "watch":
-      channelID = getChannelIDWatchPage(document)
-      while (!channelID) {
+      rssURL = getRSSUrlFromWatchPage(document)
+      while (!rssURL) {
         await delay(500)
         console.log("waiting to get channel ID...")
-        channelID = getChannelIDWatchPage(document)
+        rssURL = getRSSUrlFromWatchPage(document)
       }
-      return channelID
+      return rssURL
     case "channel":
-      return document.querySelector("[name=\"twitter:url\"]")?.content
+      return getRSSURLFromChannelPage(document)
     case "user":
-      channelID = getChannelIDUserPage(document)
-      while (!channelID) {
+      rssURL = getRSSURLFromUserPage(document)
+      while (!rssURL) {
         await delay(500)
-        channelID = getChannelIDUserPage(document)
+        rssURL = getRSSURLFromUserPage(document)
       }
-      return channelID
+      return rssURL
     default:
       return null
   }
 
 }
 
-const createYoutubeRSSImage = (document, imageURL) => {
+const createYoutubeRSSImage = (pageType, document, imageURL) => {
   const rssImage = document.createElement("img")
   rssImage.src = imageURL
   rssImage.style.height = "30px"
-  rssImage.style.marginLeft = "10px"
-  rssImage.style.marginBottom = "12px"
+  if (pageType !== "channel" && pageType !== "user") {
+    rssImage.style.marginLeft = "10px"
+    rssImage.style.marginBottom = "12px"
+  } else {
+    rssImage.style.marginLeft = "6px"
+    rssImage.style.marginBottom = "10px"
+  }
   return rssImage
 }
 
@@ -81,7 +119,21 @@ const createRssElement = (image) => {
   return rssElement
 }
 
-const getSubscribeElement = (document) => document.querySelectorAll("#subscribe-button")?.[1]?.parentElement
+const getSubscribeElement = (pageType, document) => {
+
+  console.log("Get sub element: ", pageType)
+
+  if (pageType === "user" || pageType == "channel") {
+    return document.querySelectorAll("#subscribe-button")?.[0]?.parentElement?.parentElement
+  }
+
+  else if (pageType === "watch") {
+    return document.querySelectorAll("#subscribe-button")?.[1]?.parentElement
+  }
+
+  return null
+
+}
 
 const getPageType = (document) => {
 
@@ -108,8 +160,6 @@ const getPageType = (document) => {
 }
 
 const main = async () => {
-  const pageType = getPageType(document)
-
   //Remove prior buttons
   const previousButtons = [...document.querySelectorAll("[" + YOUTUBE_RSS_BUTTON_ID + "]")]
   console.log("Prior buttons: " + previousButtons.length)
@@ -117,32 +167,35 @@ const main = async () => {
     item?.remove()
   })
 
+  const pageType = getPageType(document)
+
   if (pageType === "main" | pageType === "other") {
-    console.log("No channel ID on this page")
+    console.log("No RSS URL on this page")
     return null
   }
 
   // Wait until the page loads
-  let subscribeElement = getSubscribeElement(document)
+  let subscribeElement = getSubscribeElement(pageType, document)
 
   while (!subscribeElement) {
+    console.log("Waiting for sub element")
     await delay(500)
-    subscribeElement = getSubscribeElement(document)
+    subscribeElement = getSubscribeElement(pageType, document)
   }
 
   const imageURL = chrome.runtime.getURL("img/rss_icon.svg")
 
-  const rssElement = createRssElement(createYoutubeRSSImage(document, imageURL))
+  const rssElement = createRssElement(createYoutubeRSSImage(pageType, document, imageURL))
 
-  // Calculate the URL on click, doing it before hand causes issues (the URL will still be from the old page)
-  rssElement.onclick = async () => {
-    const channelID = await getChannelID(pageType, document)
-    if (!channelID) {
+  // Calculate the URL on hover, doing it before hand causes issues (the URL will still be from the old page)
+  rssElement.onmouseover = async () => {
+    const rssURL = await getRSSURL(pageType, document)
+    if (!rssURL) {
       return
     }
-    const rssURL = "https://www.youtube.com/feeds/videos.xml?channel_id=" + channelID
     rssElement.href = rssURL
   }
+
   subscribeElement.appendChild(rssElement)
   console.log("Create button")
 }
