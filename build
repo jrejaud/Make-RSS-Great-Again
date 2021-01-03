@@ -1,0 +1,3 @@
+#Builds the zip file
+zip -r archive/bin.zip * -x archive/
+echo "Zipped up chrome extension"
