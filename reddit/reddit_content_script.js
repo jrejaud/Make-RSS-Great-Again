@@ -45,7 +45,15 @@ const createRssElement = (url, image) => {
   return rssElement
 }
 
+let functionRunning = false
+
 const main = async () => {
+
+  // If the function is already running, then wait unti it's done
+  while (functionRunning) {
+    await delay(500)
+  }
+  functionRunning = true
 
   // Remove previous buttons
   const previousButtons = [...document.querySelectorAll("[" + REDDIT_RSS_BUTTON_ID + "]")]
@@ -97,8 +105,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     return
   }
 
-  main().then()
+  main().then().finally(() => functionRunning = false)
 }
 )
 
-main().then()
+main().then().finally(() => functionRunning = false)

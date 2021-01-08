@@ -1,18 +1,3 @@
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.message !== "make-youtube-great-again") {
-    return
-  }
-
-  console.log("running YT script")
-  main()
-    .then(done => {
-      console.log("DONE")
-      console.log(done)
-    }).catch(err => {
-      console.log("ERROR")
-      console.error(err)
-    })
-})
 
 const YOUTUBE_RSS_BUTTON_ID = "data-make-youtube-great-again"
 
@@ -159,7 +144,15 @@ const getPageType = (document) => {
   return "other"
 }
 
+let functionRunning = false
+
 const main = async () => {
+
+  while (functionRunning) {
+    await delay(500)
+  }
+  functionRunning = true
+
   //Remove prior buttons
   const previousButtons = [...document.querySelectorAll("[" + YOUTUBE_RSS_BUTTON_ID + "]")]
   console.log("Prior buttons: " + previousButtons.length)
@@ -200,4 +193,13 @@ const main = async () => {
   console.log("Create button")
 }
 
-main()
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.message !== "make-youtube-great-again") {
+    return
+  }
+
+  main().then().finally(() => functionRunning = false)
+})
+
+
+main().then().finally(() => functionRunning = false)

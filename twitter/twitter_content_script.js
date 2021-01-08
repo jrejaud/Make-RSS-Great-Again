@@ -39,7 +39,15 @@ const createRssElement = (url, image) => {
   return rssElement
 }
 
+let functionRunning = false
+
 const main = async () => {
+  // If the function is already running, then wait unti it's done
+  while (functionRunning) {
+    await delay(500)
+  }
+  functionRunning = true
+
   const pagePath = document.location.pathname.split("/")?.[1]
 
   const pagesThatAreNotUserNames = ["home", "explore", "notifications", "messages", "i", "compose"]
@@ -73,10 +81,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     return
   }
 
-  main().then()
+  main().then().finally(() => functionRunning = false)
 }
 )
 
 // This page is loaded at document_end
 // (so that is will be ready to receive the message from the background script)
-main().then()
+main().then().finally(() => functionRunning = false)
