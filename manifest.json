@@ -1,6 +1,6 @@
 {
   "name": "Make RSS Great Again",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Adds RSS buttons to websites",
   "manifest_version": 2,
   "web_accessible_resources": [
