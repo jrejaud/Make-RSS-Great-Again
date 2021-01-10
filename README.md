@@ -1,5 +1,9 @@
 # Make RSS Great Again
 
+## Install Instructions
+Download on Chrome/ Brave via the [Chrome Web Store](https://chrome.google.com/webstore/detail/make-rss-great-again/hgpchmdkbpnhmlioadpmggehanhogcbc)
+or download this repo and unpack it yourself
+
 Returns lost RSS functionality to: 
 
 * Reddit (both subreddits and individual comments pages)
