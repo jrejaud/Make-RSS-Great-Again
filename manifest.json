@@ -42,6 +42,15 @@
         "reddit/reddit_content_script.js"
       ],
       "run_at": "document_end"
+    },
+    {
+      "matches": [
+        "https://news.ycombinator.com/*"
+      ],
+      "js": [
+        "hackernews/hackernews_content_script.js"
+      ],
+      "run_at": "document_end"
     }
   ],
   "permissions": [
