@@ -1,15 +1,18 @@
 # Make RSS Great Again
 
-## Install Instructions
+## Install 
 Download on Chrome/ Brave via the [Chrome Web Store](https://chrome.google.com/webstore/detail/make-rss-great-again/hgpchmdkbpnhmlioadpmggehanhogcbc)
 or download this repo and unpack it yourself
 
+## Overview
 Returns lost RSS functionality to: 
 
 * Reddit (both subreddits and individual comments pages)
 * Youtube (minor bugs on some channels)
 * Twitter
 * Hackernews
+
+## Details
 
 Before social media feeds (Twitter, Reddit, Facebook, Youtube ect) took over the internet, the web of ~ a decade ago used to rely more on RSS. Websites/Blogs had RSS icons (the orange thing with the wifi logo tilted at an angle) that generated RSS Feeds when you clicked on them. You would then add that RSS Feed to your RSS app of choice and be able to read multiple RSS feeds from multiple sources inside a single app.
 
